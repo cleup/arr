@@ -1,0 +1,27 @@
+{
+    "name": "cleup/arr",
+    "version": "1.0.3",
+    "description": "Convenient extension of array handling functionality",
+    "keywords": [
+        "array",
+        "arr",
+        "php"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/cleup/arr",
+    "authors": [
+        {
+            "name": "Eduard Y",
+            "email": "dev@priveted.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cleup\\Helpers\\": "src/"
+        }
+    }
+}
