@@ -12,7 +12,7 @@ class Arr
      * @param array $array
      * @return void
      */
-    public static function push($key, $value, &$arr)
+    public static function append($key, $value, &$arr)
     {
         if (($keys = explode('.', $key)) && count($keys)) {
             $data = static::get($key, $arr);
@@ -36,7 +36,7 @@ class Arr
      * @param array $arr
      * @return void
      */
-    public static function unshift($key, $value, &$arr)
+    public static function prepend($key, $value, &$arr)
     {
         if (($keys = explode('.', $key)) && count($keys)) {
             $data = static::get($key, $arr);
@@ -265,5 +265,20 @@ class Arr
         $finalItem = array_pop($array);
 
         return implode($glue, $array) . $finalGlue . $finalItem;
+    }
+
+    /**
+     * Retrieve only the required elements from the specified array.
+     *
+     * @param array $array
+     * @param array|string $keys
+     * @return array
+     */
+    public static function only($array, $keys)
+    {
+        return array_intersect_key(
+            $array,
+            array_flip((array) $keys)
+        );
     }
 }

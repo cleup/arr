@@ -23,7 +23,7 @@ $array = array(
     ]
 );
 
-# Set - Sets the value by overwriting all items
+# Sets the value by overwriting all items
 Arr::set('name', 'Jimmy', $array);
 Arr::set('data.age', 18, $array);
 Arr::set('data.tasks', [
@@ -44,7 +44,7 @@ Arr::set('data.tasks', [
 ]
 */
 
-# Replace - Replaces the old value with the new one without overwriting the whole array or its fragment
+# Replaces the old value with the new one without overwriting the whole array or its fragment
 Arr::replace('data', [
     'age' => 30,
 ], $array);
@@ -56,8 +56,8 @@ Arr::replace('data', [
 ...
 */
 
-# Push - Adds a new element to the end of the array
-Arr::push('data.tasks', 'Feeding the cat', $array);
+# Adds a new element to the end of the array
+Arr::append('data.tasks', 'Feeding the cat', $array);
 /*
 ...
     "tasks" => [
@@ -68,8 +68,8 @@ Arr::push('data.tasks', 'Feeding the cat', $array);
 ...
 */
 
-# Unshift - Adds a new element to the beginning of the array
-Arr::unshift('data.tasks', 'Watch a movie', $array);
+# Adds a new element to the beginning of the array
+Arr::prepend('data.tasks', 'Watch a movie', $array);
 /*
 ...
     "tasks" => [
@@ -81,7 +81,7 @@ Arr::unshift('data.tasks', 'Watch a movie', $array);
 ...
 */
 
-# Delete - Deletes a value from the array
+# Deletes a value from the array
 Arr::delete('data.gender', $array);
 /*
 ...
@@ -93,7 +93,7 @@ Arr::delete('data.gender', $array);
 ...
 */
 
-# Get - Recursively get the value of the array
+# Recursively get the value of the array
 Arr::get('name', $array); // Jimmy
 Arr::get('data.tasks.0', $array); // Watch a movie
 Arr::get('data.tasks', $array);
@@ -106,14 +106,14 @@ Arr::get('data.tasks', $array);
 ]
 */
 
-# Has - Does the array contain the specified key
+# Does the array contain the specified key
 Arr::has('data.tasks.1', $array); // true
 Arr::has('data.work', $array); // false
 ```
 
 ##### Default methods
 ```php
-# isAssoc - Determines if an array is associative.
+# Determines if an array is associative.
 $assoc = array(
     'name'  => 'Edward',
     'gender' => 'male'
@@ -123,11 +123,11 @@ $list = ['Apple', 'Orange'];
 Arr::isAssoc($assoc); // true
 Arr::isAssoc($list);  // false
 
-# isList - Determines whether the array is a list.
+# Determines whether the array is a list.
 Arr::isList($list);  // true
 Arr::isList($assoc); // false
 
-# Map - Matching for each of the array elements.
+# Matching for each of the array elements.
 $newAssoc = Arr::map($assoc, function($value, $key) {
     return strtoupper($value);
 });
@@ -138,10 +138,10 @@ $newAssoc = Arr::map($assoc, function($value, $key) {
 ];
 */
 
-# Query - Convert the array into a query string.
+# Convert the array into a query string.
 $result =  Arr::query($assoc); // "name=Edward&gender=male"
 
-# Divide - Divide the array into keys and values.
+# Divide the array into keys and values.
 [$keys, $values] = Arr::divide($assoc);
 /* 
     $keys = [
@@ -154,7 +154,14 @@ $result =  Arr::query($assoc); // "name=Edward&gender=male"
     ];
 */
 
-# Join - Join all items using a string.
+# Join all items using a string.
 Arr::join($list, ','); // "Apple,Orange,Cherry"
 Arr::join($list, ', ', ' or '); // "Apple, Orange or Cherry"
+
+# Retrieve only the required elements from the specified array.
+Arr:only($assoc, 'gender') // ['gender' => 'male']
+Arr:only($assoc, [
+    'name',
+    'gender'
+]) // ['name' => 'Edward', gender' => 'male']
 ```
