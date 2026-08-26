@@ -9,19 +9,24 @@ class Arr
      *
      * @param string|int $key - Dot syntax
      * @param mixed $value
-     * @param array $array
+     * @param array $arr
      * @return void
      */
-    public static function append($key, $value, &$arr)
-    {
+    public static function append(
+        string|int $key,
+        mixed $value,
+        array &$arr
+    ): void {
+        $key = (string)$key;
+
         if (($keys = explode('.', $key)) && count($keys)) {
             $data = static::get($key, $arr);
 
             if (!isset($data))
-                $result = array($value);
+                $result = [$value];
             else {
                 $result = !is_array($data) ? [$data] : $data;
-                array_push($result, $value);
+                $result[] = $value;
             }
 
             static::set($key, $result, $arr);
@@ -36,13 +41,18 @@ class Arr
      * @param array $arr
      * @return void
      */
-    public static function prepend($key, $value, &$arr)
-    {
+    public static function prepend(
+        string|int $key,
+        mixed $value,
+        array &$arr
+    ): void {
+        $key = (string)$key;
+
         if (($keys = explode('.', $key)) && count($keys)) {
             $data = static::get($key, $arr);
 
             if (!isset($data))
-                static::set($key, array($value), $arr);
+                static::set($key, [$value], $arr);
             else {
                 $result = !is_array($data) ? [$data] : $data;
                 array_unshift($result, $value);
@@ -57,10 +67,15 @@ class Arr
      * @param string|int $key - Dot syntax
      * @param mixed $value
      * @param array $arr
-     * @return void
+     * @return array
      */
-    public static function replace($key, $value, &$arr)
-    {
+    public static function replace(
+        string|int $key,
+        mixed $value,
+        array &$arr
+    ): array {
+        $key = (string)$key;
+
         if (($keys = explode('.', $key)) && count($keys)) {
             $data = static::get($key, $arr);
 
@@ -93,8 +108,13 @@ class Arr
      * @param array $arr
      * @return void
      */
-    public static function set($key, $value, &$arr)
-    {
+    public static function set(
+        string|int $key,
+        mixed $value,
+        array &$arr
+    ): void {
+        $key = (string)$key;
+
         if (strpos($key, '.') !== false && ($keys = explode('.', $key)) && count($keys)) {
             while (count($keys) > 1) {
                 $key = array_shift($keys);
@@ -106,8 +126,9 @@ class Arr
             }
 
             $arr[array_shift($keys)] = $value;
-        } else
+        } else {
             $arr[$key] = $value;
+        }
     }
 
     /**
@@ -117,36 +138,50 @@ class Arr
      * @param array $arr
      * @return void
      */
-    public static function delete($key, &$arr)
-    {
-        if (($keys = explode('.', $key)) && count($keys)) {
-            while (count($keys) > 1) {
-                $arr = &$arr[array_shift($keys)];
-            }
+    public static function delete(
+        string|int $key,
+        array &$arr
+    ): void {
+        $key = (string)$key;
+        $keys = explode('.', $key);
 
-            if (static::has($key, $arr))
-                unset($arr[array_shift($keys)]);
-        } else {
-            if (static::has($key, $arr))
-                unset($arr[$key]);
+        if (count($keys) === 1) {
+            unset($arr[$key]);
+            return;
         }
+
+        $temp = &$arr;
+        $lastKey = array_pop($keys);
+
+        foreach ($keys as $part) {
+            if (!isset($temp[$part]) || !is_array($temp[$part])) {
+                return;
+            }
+            $temp = &$temp[$part];
+        }
+
+        unset($temp[$lastKey]);
     }
 
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
-     * @param string $keys - Dot syntax
+     * @param string|int $key - Dot syntax
      * @param array $arr
      * @return bool
      */
-    public static function has($key, $arr)
-    {
+    public static function has(
+        string|int $key,
+        array $arr
+    ): bool {
+        $key = (string)$key;
+
         if (count(($keys = explode('.', $key)))) {
-            foreach ($keys as $key) {
-                if (!isset($arr[$key]))
+            foreach ($keys as $itemKey) {
+                if (!isset($arr[$itemKey]))
                     return false;
 
-                $arr = $arr[$key];
+                $arr = $arr[$itemKey];
             }
 
             return true;
@@ -158,19 +193,24 @@ class Arr
     /**
      * Recursively get the value of the array
      * 
-     * @param string $key - Dot syntax
+     * @param string|int $key - Dot syntax
      * @param array $arr
      * @param mixed $default
      * @return mixed
      */
-    public static function get($key, $arr, $default = null)
-    {
+    public static function get(
+        string|int $key,
+        array $arr,
+        mixed $default = null
+    ): mixed {
+        $key = (string)$key;
+
         if (strpos($key, '.') !== false && count(($keys = explode('.', $key)))) {
-            foreach ($keys as $key) {
-                if (!isset($arr[$key]))
+            foreach ($keys as $itemKey) {
+                if (!isset($arr[$itemKey]))
                     return $default;
 
-                $arr = $arr[$key];
+                $arr = $arr[$itemKey];
             }
 
             return $arr;
@@ -185,7 +225,7 @@ class Arr
      * @param array $array
      * @return bool
      */
-    public static function isAssoc($array)
+    public static function isAssoc(array $array): bool
     {
         return !array_is_list($array);
     }
@@ -196,7 +236,7 @@ class Arr
      * @param array $array
      * @return bool
      */
-    public static function isList($array)
+    public static function isList(array $array): bool
     {
         return array_is_list($array);
     }
@@ -204,12 +244,14 @@ class Arr
     /**
      * Matching for each of the array elements.
      *
-     * @param  array  $array
-     * @param  callable  $callback
+     * @param array $array
+     * @param callable $callback
      * @return array
      */
-    public static function map(array $array, callable $callback)
-    {
+    public static function map(
+        array $array,
+        callable $callback
+    ): array {
         $keys = array_keys($array);
 
         try {
@@ -224,10 +266,10 @@ class Arr
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param array $array
      * @return string
      */
-    public static function query($array)
+    public static function query(array $array): string
     {
         return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
     }
@@ -238,7 +280,7 @@ class Arr
      * @param array $array
      * @return array
      */
-    public static function divide($array)
+    public static function divide(array $array): array
     {
         return [array_keys($array), array_values($array)];
     }
@@ -246,13 +288,16 @@ class Arr
     /**
      * Join all items using a string.
      *
-     * @param array  $array
+     * @param array $array
      * @param string $glue
      * @param string $finalGlue
      * @return string
      */
-    public static function join($array, $glue, $finalGlue = '')
-    {
+    public static function join(
+        array $array,
+        string $glue,
+        string $finalGlue = ''
+    ): string {
         if ($finalGlue === '')
             return implode($glue, $array);
 
@@ -260,7 +305,7 @@ class Arr
             return '';
 
         if (count($array) === 1)
-            return end($array);
+            return (string)end($array);
 
         $finalItem = array_pop($array);
 
@@ -274,8 +319,10 @@ class Arr
      * @param array|string $keys
      * @return array
      */
-    public static function only($array, $keys)
-    {
+    public static function only(
+        array $array,
+        array|string $keys
+    ): array {
         return array_intersect_key(
             $array,
             array_flip((array) $keys)
